@@ -21,7 +21,7 @@ import {
 import {Colors, Header} from 'react-native/Libraries/NewAppScreen';
 
 // Flow compatible
-import {getVersion} from 'component-a';
+import {getVersion} from '@dfs-demo/component-a';
 
 const App: () => Node = () => {
   const isDarkMode = useColorScheme() === 'dark';

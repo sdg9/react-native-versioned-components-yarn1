@@ -1097,7 +1097,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@dfs-demo/component-a@0.1.0, @dfs-demo/component-a@workspace:packages/component-A":
+"@dfs-demo/component-a@npm:0.1.0":
+  version: 0.1.0
+  resolution: "@dfs-demo/component-a@npm:0.1.0"
+  peerDependencies:
+    typescript: "*"
+  checksum: 727c1a4bfb1e373e6167e65440590472048b5652a6294bdf8840e4ff65ef271c25bf005ba19aff9c2d3f800c3b0cd95d94bfa9e2a3e0239eb32d3cf253043d7f
+  languageName: node
+  linkType: hard
+
+"@dfs-demo/component-a@workspace:packages/component-A":
   version: 0.0.0-use.local
   resolution: "@dfs-demo/component-a@workspace:packages/component-A"
   peerDependencies:
