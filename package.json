@@ -1,0 +1,23 @@
+{
+  "name": "react-native-versioned-components",
+  "packageManager": "yarn@3.2.3",
+  "private": true,
+  "workspaces": {
+    "packages": [
+      "app-mobile",
+      "packages/*",
+      "internals/*"
+    ]
+  },
+  "scripts": {
+    "android": "yarn workspace app-mobile android",
+    "start": "yarn workspace app-mobile start",
+    "flow": "yarn workspace app-mobile flow",
+    "test": "yarn workspace app-mobile test",
+    "lint": "yarn workspace app-mobile lint"
+  },
+  "devDependencies": {
+    "ts-node": "^10.8.0",
+    "typescript": "^4.7.2"
+  }
+}
