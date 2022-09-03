@@ -1,6 +1,6 @@
 {
   "name": "@dfs-demo/component-a",
-  "version": "1.1.1",
+  "version": "0.5.0",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -9,9 +9,6 @@
   "main": "src/index.ts",
   "scripts": {
     "tsc": "npx tsc",
-    "publish": "npm publish --access public"
-  },
-  "peerDependencies": {
-    "typescript": "*"
+    "publish": "yarn npm publish --access public"
   }
 }

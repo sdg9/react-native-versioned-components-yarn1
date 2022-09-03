@@ -20,3 +20,6 @@ This project demonstrates react native, using yarn to version components in a mo
 
 ### Use Remote
 - yarn workspace app-mobile add @dfs-demo/component-a@0.1.1
+
+### TODO
+Understand existing RN behavior based on `workspaces-not-required-with-metro` branch.  That is yarn workspaces don't seem to be required for metro bundler to allow for workspace support.
