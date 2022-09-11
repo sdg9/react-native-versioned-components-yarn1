@@ -41,7 +41,13 @@ const App: () => Node = () => {
           style={{
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
           }}>
-          <Text>Using Component-A directly {getVersion()}</Text>
+          <Text>App can reference A directly (using {getVersion()})</Text>
+          <Text>
+            App can reference B who references A (using {getVersion()})
+          </Text>
+          <Text>
+            App can reference C who references A (using {getVersion()})
+          </Text>
         </View>
       </ScrollView>
     </SafeAreaView>

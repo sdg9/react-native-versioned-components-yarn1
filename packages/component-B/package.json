@@ -1,0 +1,8 @@
+{
+  "name": "@dfs-demo/component-b",
+  "version": "0.1.0",
+  "license": "MIT",
+  "dependencies": {
+    "@dfs-demo/component-a": "^3.0.0"
+  }
+}

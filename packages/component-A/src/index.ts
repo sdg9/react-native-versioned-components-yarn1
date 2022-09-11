@@ -1,3 +1,3 @@
 export const getVersion = () => {
-  return "Component-A 1.1.1";
+  return "Component-A 0.3.0 (local)";
 };
