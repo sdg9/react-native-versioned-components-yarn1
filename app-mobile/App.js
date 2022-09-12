@@ -22,6 +22,8 @@ import {Colors, Header} from 'react-native/Libraries/NewAppScreen';
 
 // Flow compatible
 import {getVersion} from '@dfs-demo/component-a';
+import {getVersion as getVersionB} from '@dfs-demo/component-b';
+import {getVersion as getVersionC} from '@dfs-demo/component-c';
 
 const App: () => Node = () => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -43,10 +45,10 @@ const App: () => Node = () => {
           }}>
           <Text>App can reference A directly (using {getVersion()})</Text>
           <Text>
-            App can reference B who references A (using {getVersion()})
+            App can reference B who references A (using {getVersionB()})
           </Text>
           <Text>
-            App can reference C who references A (using {getVersion()})
+            App can reference C who references A (using {getVersionC()})
           </Text>
         </View>
       </ScrollView>
