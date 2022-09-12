@@ -46,3 +46,109 @@ Unlike node where I can use yarn workspaces to point local on version match or r
 - Read up more on metro: https://facebook.github.io/metro/docs/resolution/#algorithm
   - understand intersection better of metro + babel
   - Issue likely is in https://facebook.github.io/metro/docs/resolution
+
+
+### Bundle when working
+
+I can see various versions of the same component (comments added). In this case
+main-app wants component-a v1.1.1
+component-b wants component-a v3.0.0
+component-c wants component-a v2.5.5
+
+```js
+
+// Main app code
+}, "App can reference A directly (using ", (0, _$$_REQUIRE(_dependencyMap[4], "@dfs-demo/component-a").getVersion)(), ")"), _react.default.createElement(_reactNative.Text, {
+    __self: _this,
+    __source: {
+    fileName: _jsxFileName,
+    lineNumber: 47,
+    columnNumber: 11
+    }
+}, "App can reference B who references A (using ", (0, _$$_REQUIRE(_dependencyMap[5], "@dfs-demo/component-b").getVersion)(), ")"), _react.default.createElement(_reactNative.Text, {
+    __self: _this,
+    __source: {
+    fileName: _jsxFileName,
+    lineNumber: 50,
+    columnNumber: 11
+    }
+}, "App can reference C who references A (using ", (0, _$$_REQUIRE(_dependencyMap[6], "@dfs-demo/component-c").getVersion)(), ")"))));
+
+
+// Remote dependency from main-app on to component-A v1.1.1
+__d(function (global, _$$_REQUIRE, _$$_IMPORT_DEFAULT, _$$_IMPORT_ALL, module, exports, _dependencyMap) {
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.getVersion = void 0;
+
+  var getVersion = function getVersion() {
+    return "Component-A 1.1.1";
+  };
+
+  exports.getVersion = getVersion;
+},504,[],"node_modules\\@dfs-demo\\component-a\\src\\index.ts");
+
+
+// My local component B
+__d(function (global, _$$_REQUIRE, _$$_IMPORT_DEFAULT, _$$_IMPORT_ALL, module, exports, _dependencyMap) {
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.getVersion = void 0;
+
+  var getVersion = function getVersion() {
+    return "Component-B 0.1.0 (local) referencing " + (0, _$$_REQUIRE(_dependencyMap[0], "@dfs-demo/component-a").getVersion)() + ", I should be referencing v3.0.0 per my local node_modules";
+  };
+
+  exports.getVersion = getVersion;
+},505,[506],"..\\packages\\component-B\\src\\index.ts");
+
+
+// Remote dependency from component-B on to v3.0.0
+__d(function (global, _$$_REQUIRE, _$$_IMPORT_DEFAULT, _$$_IMPORT_ALL, module, exports, _dependencyMap) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.getVersion = void 0;
+
+  var getVersion = function getVersion() {
+    return "Component-A 3.0.0";
+  };
+
+  exports.getVersion = getVersion;
+},506,[],"..\\packages\\component-B\\node_modules\\@dfs-demo\\component-a\\dist\\index.js");
+
+
+// My local component C
+__d(function (global, _$$_REQUIRE, _$$_IMPORT_DEFAULT, _$$_IMPORT_ALL, module, exports, _dependencyMap) {
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.getVersion = void 0;
+
+  var getVersion = function getVersion() {
+    return "Component-C 0.1.0 (local) referencing " + (0, _$$_REQUIRE(_dependencyMap[0], "@dfs-demo/component-a").getVersion)();
+  };
+
+  exports.getVersion = getVersion;
+},507,[508],"..\\packages\\component-C\\src\\index.ts");
+
+// Remote dependency from component-C on to v2.5.5
+__d(function (global, _$$_REQUIRE, _$$_IMPORT_DEFAULT, _$$_IMPORT_ALL, module, exports, _dependencyMap) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.getVersion = void 0;
+
+  var getVersion = function getVersion() {
+    return "Component-A 2.5.5";
+  };
+
+  exports.getVersion = getVersion;
+},508,[],"..\\node_modules\\@dfs-demo\\component-a\\dist\\index.js");
+```

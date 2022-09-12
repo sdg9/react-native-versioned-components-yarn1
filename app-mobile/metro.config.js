@@ -4,19 +4,12 @@
  *
  * @format
  */
-const path = require('path');
+const {makeMetroConfig} = require('@rnx-kit/metro-config');
+const MetroSymlinksResolver = require('@rnx-kit/metro-resolver-symlinks');
 
-module.exports = {
-  watchFolders: [path.resolve(__dirname, '../')],
-  transformer: {
-    getTransformOptions: async () => ({
-      transform: {
-        experimentalImportSupport: false,
-        inlineRequires: true,
-      },
-    }),
-  },
+module.exports = makeMetroConfig({
+  projectRoot: __dirname,
   resolver: {
-    nodeModulesPaths: [],
+    resolveRequest: MetroSymlinksResolver(),
   },
-};
+});

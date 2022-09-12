@@ -7,9 +7,6 @@
       "app-mobile",
       "packages/*",
       "internals/*"
-    ],
-    "nohoist": [
-      "@dfs-demo/**"
     ]
   },
   "scripts": {
@@ -20,6 +17,8 @@
     "lint": "yarn workspace app-mobile lint"
   },
   "devDependencies": {
+    "@rnx-kit/metro-config": "^1.2.38",
+    "@rnx-kit/metro-resolver-symlinks": "^0.1.21",
     "ts-node": "^10.8.0",
     "typescript": "^4.7.2"
   }
