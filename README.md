@@ -1,154 +1,106 @@
-This project demonstrates react native, using yarn to version components in a monorepo.
+# Purpose
+This project demonstrates using versioned component within a React Native monorepo. 
 
+The goal is to understand how one can point to a remote package manager for published code yet keep in-progress code local in the repo.
 
-### Instructions
+To take it to the extreme, the content in app-mobile could largely just be a package.json file pointing to all dependencies.  A release to prod could be little more than making sure all versions are correct.
 
-- Make sure you have yarn 3
+# Setup
+
+- Make sure you have yarn 1
 - Clone project
 - Run `yarn install`
+- Run `yarn start`
+- Install binary to device (android tested) and launch
 
+# Output
 
-### Publishing
+## Using Remote
 
-- Make updates to desired component
-- Run `yarn workspace @dfs-demo/component-a tsc`
-- `npm publish dist/libs/interceptor-react-native-with-reactotron --access public`
+By default you'll see the app reference the remote component A *v3.0.0) pulled from npm instead of the local version of component A (v3.1.0)
 
-
-### Use Local
-- yarn workspace app-mobile add @dfs-demo/component-a@0.1.0
-
-### Use Remote
-- yarn workspace app-mobile add @dfs-demo/component-a@0.1.1
-
-### TODO
-Understand existing RN behavior based on `workspaces-not-required-with-metro` branch.  That is yarn workspaces don't seem to be required for metro bundler to allow for workspace support.
-
-
-### Errors
-
-- If I rename local component-a then I get the following error: 
-  - Error: Unable to resolve module @dfs-demo/component-a from C:\Users\steve\development\react-native-versioned-components-yarn1\app-mobile\App.js: @dfs-demo/component-a could not be found within the project or in these directories:
-  node_modules
-  ..\node_modules
-So it appears to attempt to resolve locally and then via node_modules.
-
-In fact there appears to be a symlink between the root `node_modules/@dfs-demo/component-a` and my local `packages/component-A` as editing one updates the other in realtime.  It seems like this package is used even if the version # doens't align.
-
-
-For example if locally I define component A, node_modules symlinks to my local version regardless of the version number.  This means I cannot split the version between other packages, i.e. everyone points local always.
-
-If I rename the package.json name of component A, then it symlinks to the new name and will look to npm to pull in the dependency.
-
-Unlike node where I can use yarn workspaces to point local on version match or remote on no local match, something in RN simply symlinks a matching package name regardless of version #.
-
-- Is this related? https://github.com/microsoft/rnx-kit/discussions/1582
-- Read up more on metro: https://facebook.github.io/metro/docs/resolution/#algorithm
-  - understand intersection better of metro + babel
-  - Issue likely is in https://facebook.github.io/metro/docs/resolution
-
-
-### Bundle when working
-
-I can see various versions of the same component (comments added). In this case
-main-app wants component-a v1.1.1
-component-b wants component-a v3.0.0
-component-c wants component-a v2.5.5
-
-```js
-
-// Main app code
-}, "App can reference A directly (using ", (0, _$$_REQUIRE(_dependencyMap[4], "@dfs-demo/component-a").getVersion)(), ")"), _react.default.createElement(_reactNative.Text, {
-    __self: _this,
-    __source: {
-    fileName: _jsxFileName,
-    lineNumber: 47,
-    columnNumber: 11
-    }
-}, "App can reference B who references A (using ", (0, _$$_REQUIRE(_dependencyMap[5], "@dfs-demo/component-b").getVersion)(), ")"), _react.default.createElement(_reactNative.Text, {
-    __self: _this,
-    __source: {
-    fileName: _jsxFileName,
-    lineNumber: 50,
-    columnNumber: 11
-    }
-}, "App can reference C who references A (using ", (0, _$$_REQUIRE(_dependencyMap[6], "@dfs-demo/component-c").getVersion)(), ")"))));
-
-
-// Remote dependency from main-app on to component-A v1.1.1
-__d(function (global, _$$_REQUIRE, _$$_IMPORT_DEFAULT, _$$_IMPORT_ALL, module, exports, _dependencyMap) {
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.getVersion = void 0;
-
-  var getVersion = function getVersion() {
-    return "Component-A 1.1.1";
-  };
-
-  exports.getVersion = getVersion;
-},504,[],"node_modules\\@dfs-demo\\component-a\\src\\index.ts");
-
-
-// My local component B
-__d(function (global, _$$_REQUIRE, _$$_IMPORT_DEFAULT, _$$_IMPORT_ALL, module, exports, _dependencyMap) {
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.getVersion = void 0;
-
-  var getVersion = function getVersion() {
-    return "Component-B 0.1.0 (local) referencing " + (0, _$$_REQUIRE(_dependencyMap[0], "@dfs-demo/component-a").getVersion)() + ", I should be referencing v3.0.0 per my local node_modules";
-  };
-
-  exports.getVersion = getVersion;
-},505,[506],"..\\packages\\component-B\\src\\index.ts");
-
-
-// Remote dependency from component-B on to v3.0.0
-__d(function (global, _$$_REQUIRE, _$$_IMPORT_DEFAULT, _$$_IMPORT_ALL, module, exports, _dependencyMap) {
-  "use strict";
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.getVersion = void 0;
-
-  var getVersion = function getVersion() {
-    return "Component-A 3.0.0";
-  };
-
-  exports.getVersion = getVersion;
-},506,[],"..\\packages\\component-B\\node_modules\\@dfs-demo\\component-a\\dist\\index.js");
-
-
-// My local component C
-__d(function (global, _$$_REQUIRE, _$$_IMPORT_DEFAULT, _$$_IMPORT_ALL, module, exports, _dependencyMap) {
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.getVersion = void 0;
-
-  var getVersion = function getVersion() {
-    return "Component-C 0.1.0 (local) referencing " + (0, _$$_REQUIRE(_dependencyMap[0], "@dfs-demo/component-a").getVersion)();
-  };
-
-  exports.getVersion = getVersion;
-},507,[508],"..\\packages\\component-C\\src\\index.ts");
-
-// Remote dependency from component-C on to v2.5.5
-__d(function (global, _$$_REQUIRE, _$$_IMPORT_DEFAULT, _$$_IMPORT_ALL, module, exports, _dependencyMap) {
-  "use strict";
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.getVersion = void 0;
-
-  var getVersion = function getVersion() {
-    return "Component-A 2.5.5";
-  };
-
-  exports.getVersion = getVersion;
-},508,[],"..\\node_modules\\@dfs-demo\\component-a\\dist\\index.js");
+```mermaid
+graph TD
+    App[app-mobile] --> |remote| A(Component A v3.0.0)
+    A2(Local Component A v3.1.0)
 ```
+
+This is because the app's package.json references `"@dfs-demo/component-a": "3.0.0"`, had it referenced 3.1.0 it would have used the local version instead of checking for a remote match.
+
+In this way we can publish a stable release of a module as version X, continue to work on it as version Y, but keep the app pointed to vX until we're ready to release.  The dev can PR changes to the component to the trunk, and not until package.json is bumped to reference vY will the chagnes be consumed, despite living in the same repo.
+
+## Using Local
+
+If we instead wanted to point local we could change the version to a wildcard `"@dfs-demo/component-a": "*"` or exact match `"@dfs-demo/component-a": "3.1.0"`.  Now the remote version sits out on npm (or another package manager) unused by our app.
+
+```mermaid
+graph TD
+    App[app-mobile] --> |local| A(Component A v3.1.0)
+    A2(Remote Component A v3.0.0)
+```
+
+## Using a mix of remote & local versions
+
+Just because something is possible doesn't mean it should be done, but if desired various components could each leverage different versions.  This quickly turns into a complex mental model (app-mobile & C use A v0.3.0, B uses A v3.0.0) with many package.json files referencing many different versions.  This also likely makes testing complex due to permutations of component versions.
+
+
+```mermaid
+graph TD
+    App[app-mobile] -->|local|A(Component A)
+    App[app-mobile] -->|local|B(Component B)
+    App[app-mobile] -->|local|C(Component C)
+    B --> |remote|A1(Component A remote v3.0.0)
+    C --> A
+```
+
+## Single version source of truth using peerDependencies
+
+This isn't working as desired. 
+
+Ideally each componenet references a peer dependency and lets the app's package.json drive the version. 
+
+```mermaid
+graph TD
+    App[app-mobile] -->|remote|A(Component A v3.0.0)
+    App[app-mobile] -->|local|B(Component B local)
+    App[app-mobile] -->|local|C(Component C local)
+    B --> |remote|A
+    C --> |remote|A
+```
+
+That is I'd expect the following to set the version to use the remote 3.0.0 version for all packages.
+
+```
+ yarn workspace app-mobile add @dfs-demo/component-a@3.0.0
+```
+
+Instead I'm getting
+
+```mermaid
+graph TD
+    App[app-mobile] -->|remote|A(Component A v3.0.0)
+    App[app-mobile] -->|local|B(Component B)
+    App[app-mobile] -->|local|C(Component C)
+    B --> |local|A2(Component A v3.1.0)
+    C --> |local|A2
+```
+
+
+The other packages (component B & C) using peerDependencies of  component a as "*" resolve to using the local 3.1.0 version (undesired).  To address this I had to run the following.
+
+```
+ yarn workspace app-mobile add @dfs-demo/component-a@3.0.0
+ yarn workspace @dfs-demo/component-b add @dfs-demo/component-a@3.0.0
+ yarn workspace @dfs-demo/component-c add @dfs-demo/component-a@3.0.0
+```
+
+## Note
+While node + yarn workspaces play nicely out of the box, the expected behavior (using the version # of the package defined, even if remote) was not working in React Native + yarn workspaces until I added the following to package.json and updated the metro.config.json file
+```
+    "@rnx-kit/metro-config": "^1.2.38",
+    "@rnx-kit/metro-resolver-symlinks": "^0.1.21",
+```
+
+This is because how the metro bundler packaged with react native resolves modules.  In fact even without yarn workspaces, metro is capable of resolving all local dependencies.   By adding the rnx-kit dependencies the metro bundler does start resolving dependencies as expected based on package.json.
+
+One caveat of this is larger projects with other customs changes to metro.config.js may have some more investigation/configuration to do before this works for them.

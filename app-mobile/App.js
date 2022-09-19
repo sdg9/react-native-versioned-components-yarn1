@@ -43,11 +43,13 @@ const App: () => Node = () => {
           style={{
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
           }}>
-          <Text>App can reference A directly (using {getVersion()})</Text>
-          <Text>
+          <Text style={{padding: 10}}>
+            App can reference A directly (using {getVersion()})
+          </Text>
+          <Text style={{padding: 10}}>
             App can reference B who references A (using {getVersionB()})
           </Text>
-          <Text>
+          <Text style={{padding: 10}}>
             App can reference C who references A (using {getVersionC()})
           </Text>
         </View>

@@ -4,6 +4,6 @@
   "license": "MIT",
   "main": "src/index.ts",
   "dependencies": {
-    "@dfs-demo/component-a": "^3.0.0"
+    "@dfs-demo/component-a": "3.0.0"
   }
 }

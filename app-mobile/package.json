@@ -10,7 +10,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@dfs-demo/component-a": "0.3.0",
+    "@dfs-demo/component-a": "3.0.0",
     "react": "17.0.2",
     "react-native": "0.68.2"
   },
