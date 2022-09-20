@@ -1,9 +1,7 @@
 # Purpose
-This project demonstrates using versioned component within a React Native monorepo. 
+This project demonstrates versioned components within a React Native monorepo whether local or hosted in a package manager. 
 
-The goal is to understand how one can point to a remote package manager for published code yet keep in-progress code local in the repo.
-
-To take it to the extreme, the content in app-mobile could largely just be a package.json file pointing to all dependencies.  A release to prod could be little more than making sure all versions are correct.
+The goal is to understand how one can point to a remote package manager for published code yet keep in-progress code local/unpublished in the repo.
 
 # Setup
 
@@ -11,96 +9,96 @@ To take it to the extreme, the content in app-mobile could largely just be a pac
 - Clone project
 - Run `yarn install`
 - Run `yarn start`
-- Install binary to device (android tested) and launch
+- Install android or iOS binary to the device and launch
+    - for this specific work android was tested
 
-# Output
+# Project Structure
 
-## Using Remote
+The application logic is in app-mobile and it consumes three components a, b, and c.  
+Each of the mentioned directories below is it's own node module (it's own yarn workspace) thus they each have a package.json
+For the sake of this demo components a, b, and c simply return a string indicating what version of package.json they are.
 
-By default you'll see the app reference the remote component A *v3.0.0) pulled from npm instead of the local version of component A (v3.1.0)
-
-```mermaid
-graph TD
-    App[app-mobile] --> |remote| A(Component A v3.0.0)
-    A2(Local Component A v3.1.0)
-```
-
-This is because the app's package.json references `"@dfs-demo/component-a": "3.0.0"`, had it referenced 3.1.0 it would have used the local version instead of checking for a remote match.
-
-In this way we can publish a stable release of a module as version X, continue to work on it as version Y, but keep the app pointed to vX until we're ready to release.  The dev can PR changes to the component to the trunk, and not until package.json is bumped to reference vY will the chagnes be consumed, despite living in the same repo.
-
-## Using Local
-
-If we instead wanted to point local we could change the version to a wildcard `"@dfs-demo/component-a": "*"` or exact match `"@dfs-demo/component-a": "3.1.0"`.  Now the remote version sits out on npm (or another package manager) unused by our app.
+- app-mobile
+- packages
+    - component-a
+    - component-b
+    - component-c
 
 ```mermaid
 graph TD
-    App[app-mobile] --> |local| A(Component A v3.1.0)
-    A2(Remote Component A v3.0.0)
+    App[app-mobile] -->A(Component A)
+    App[app-mobile] -->B(Component B)
+    App[app-mobile] -->C(Component C)
 ```
 
-## Using a mix of remote & local versions
+# Results
 
-Just because something is possible doesn't mean it should be done, but if desired various components could each leverage different versions.  This quickly turns into a complex mental model (app-mobile & C use A v0.3.0, B uses A v3.0.0) with many package.json files referencing many different versions.  This also likely makes testing complex due to permutations of component versions.
+Given component A v3.0.0 is hosted in npm and v3.1.0 is currently the local version....
 
+1. Can I point to the local version of my component?
+   1. Yes, the local version can be referenced in package.json
+      1. `yarn workspace app-mobile add @dfs-demo/component-a@3.1.0`
+2. Can I point to a different version of my component?
+   1. Yes, a version published to a package manager can be referenced in package.json
+      1. `yarn workspace app-mobile add @dfs-demo/component-a@3.0.0`
+      2. This results in the local version of the code for the component to be left unused
+      3.  ```mermaid
+          graph TD
+          App[app-mobile] --> |remote| A(Component A v3.0.0)
+          A2(Local Component A v3.1.0)
+          ```
+3. Can I point to multiple versions of the same component?
+   1. Sort of, but it becomes mentally complex.
+   2. While each package.json can only point to a single version of a module, via transient dependencies you could reference different versions of the same module.
+   3. Keep in mind just becaue something is possible doesn't mean it should be done, the downside here is the permutations of component relationships may be difficult to test and to understand.
+   4. 
+        ```mermaid
+        graph TD
+            App[app-mobile] -->|local|A(Component A)
+            App[app-mobile] -->|local|B(Component B)
+            App[app-mobile] -->|local|C(Component C)
+            B --> |remote|A1(Component A remote v3.0.0)
+            C --> A
+        ```
+4. Do I have to manage multiple versions of each component across multiple package.json files?
+   1. I was under the assumption that if one module's package.json defined the dependencies and their versions, the other dependent modules could simply list peerDependencies with a wildcard and in that way the single package.json would drive all version numbers.
+      1. I envisioned this where app-mobile would drive the version number of component A in it's own package.json
+        ```mermaid
+        graph TD
+            App[app-mobile] -->|remote|A(Component A v3.0.0)
+            App[app-mobile] -->|local|B(Component B local)
+            App[app-mobile] -->|local|C(Component C local)
+            B --> |remote|A
+            C --> |remote|A
+        ```
+      2. In reality I got this when a higher version existed local than in npm
+        ```mermaid
+        graph TD
+            App[app-mobile] -->|remote|A(Component A v3.0.0)
+            App[app-mobile] -->|local|B(Component B)
+            App[app-mobile] -->|local|C(Component C)
+            B --> |local|A2(Component A v3.1.0)
+            C --> |local|A2
+        ```
+      3. To address this I had to manually specify the desired version in each module
+            ```
+            yarn workspace app-mobile add @dfs-demo/component-a@3.0.0
+            yarn workspace @dfs-demo/component-b add @dfs-demo/component-a@3.0.0
+            yarn workspace @dfs-demo/component-c add @dfs-demo/component-a@3.0.0
+            ```
+# Unexpected Findings
+1. A library is required to make yarn workspaces + metro play nicely.
+   1. This is because metro has it's own resolution process that isn't the same as vanilla node
+   2.  ```
+       "@rnx-kit/metro-config": "^1.2.38",
+       "@rnx-kit/metro-resolver-symlinks": "^0.1.21",
+        ```
+   3. There may be caveats on larger projects or projects with custom configurations as metro.config.js also needs to be updated to support rnx-kit
+   4. Surprisingly to me, if you only want to point to local versions of your code metro can work out of the box w/out yarn workspaces.
 
-```mermaid
-graph TD
-    App[app-mobile] -->|local|A(Component A)
-    App[app-mobile] -->|local|B(Component B)
-    App[app-mobile] -->|local|C(Component C)
-    B --> |remote|A1(Component A remote v3.0.0)
-    C --> A
-```
+# Future Possibilities
 
-## Single version source of truth using peerDependencies
-
-This isn't working as desired. 
-
-Ideally each componenet references a peer dependency and lets the app's package.json drive the version. 
-
-```mermaid
-graph TD
-    App[app-mobile] -->|remote|A(Component A v3.0.0)
-    App[app-mobile] -->|local|B(Component B local)
-    App[app-mobile] -->|local|C(Component C local)
-    B --> |remote|A
-    C --> |remote|A
-```
-
-That is I'd expect the following to set the version to use the remote 3.0.0 version for all packages.
-
-```
- yarn workspace app-mobile add @dfs-demo/component-a@3.0.0
-```
-
-Instead I'm getting
-
-```mermaid
-graph TD
-    App[app-mobile] -->|remote|A(Component A v3.0.0)
-    App[app-mobile] -->|local|B(Component B)
-    App[app-mobile] -->|local|C(Component C)
-    B --> |local|A2(Component A v3.1.0)
-    C --> |local|A2
-```
-
-
-The other packages (component B & C) using peerDependencies of  component a as "*" resolve to using the local 3.1.0 version (undesired).  To address this I had to run the following.
-
-```
- yarn workspace app-mobile add @dfs-demo/component-a@3.0.0
- yarn workspace @dfs-demo/component-b add @dfs-demo/component-a@3.0.0
- yarn workspace @dfs-demo/component-c add @dfs-demo/component-a@3.0.0
-```
-
-## Note
-While node + yarn workspaces play nicely out of the box, the expected behavior (using the version # of the package defined, even if remote) was not working in React Native + yarn workspaces until I added the following to package.json and updated the metro.config.json file
-```
-    "@rnx-kit/metro-config": "^1.2.38",
-    "@rnx-kit/metro-resolver-symlinks": "^0.1.21",
-```
-
-This is because how the metro bundler packaged with react native resolves modules.  In fact even without yarn workspaces, metro is capable of resolving all local dependencies.   By adding the rnx-kit dependencies the metro bundler does start resolving dependencies as expected based on package.json.
-
-One caveat of this is larger projects with other customs changes to metro.config.js may have some more investigation/configuration to do before this works for them.
+1. Taking these findings to the exterme, it may be possible to have a core app comprised of little more than a package.json file and a js entry point.  All dependencies could be their own local or published module.  
+   1. Modules could individually be published
+   2. An app release would largely be bumping versions in the package.json, making a build, and deploying.
+   3. Testing would be better scoped, i.e. to test module X you could largely take the existing prod app and bump only module X to assert things behave as expected. 
