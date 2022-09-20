@@ -79,8 +79,8 @@ The modules in this demo do nothing more than output what module version they ar
         ```mermaid
         graph TD
             App[app-mobile] -->|remote|A(Component A v3.0.0)
-            App[app-mobile] -->|local|B(Component B local)
-            App[app-mobile] -->|local|C(Component C local)
+            App[app-mobile] -->|local|B(Component B)
+            App[app-mobile] -->|local|C(Component C)
             B --> |remote|A
             C --> |remote|A
         ```
